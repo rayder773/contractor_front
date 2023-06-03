@@ -146,6 +146,11 @@ class ObjectModel extends Model {
 
 //DOM Elements
 
+type optionsType = {
+  preventDefault?: boolean;
+  stopPropagation?: boolean;
+};
+
 class DOMElement extends Controllable {
   private events: string[][] = [];
 
@@ -165,15 +170,43 @@ class DOMElement extends Controllable {
     return this.element;
   }
 
-  public addEventListener(event: string, emitEvent: string) {
-    this.element.addEventListener(event, this.emitEvent.bind(this, emitEvent));
+  public addEventListener(
+    event: string,
+    emitEvent: string,
+    options?: optionsType
+  ) {
+    this.element.addEventListener(
+      event,
+      this.emitEvent.bind(this, { emitEvent, options })
+    );
 
     this.events.push([event, emitEvent]);
 
     return this;
   }
 
-  private emitEvent(emitEvent: string, e: Event) {
+  private emitEvent(
+    {
+      emitEvent,
+      options,
+    }: {
+      emitEvent: string;
+      options?: optionsType;
+    },
+    e: Event
+  ) {
+    if (options) {
+      const { preventDefault, stopPropagation } = options;
+
+      if (preventDefault) {
+        e.preventDefault();
+      }
+
+      if (stopPropagation) {
+        e.stopPropagation();
+      }
+    }
+
     return this.emit(emitEvent, e);
   }
 
@@ -193,7 +226,7 @@ class DOMElement extends Controllable {
     this.events.forEach(([event, emitEvent]) => {
       this.element.removeEventListener(
         event,
-        this.emitEvent.bind(this, emitEvent)
+        this.emitEvent.bind(this, { emitEvent })
       );
     });
 
@@ -228,16 +261,24 @@ class ContainerElement extends DOMElement {
     return this;
   }
 
+  recursivelySetController(children: DOMElement[]) {
+    if (this.controller) {
+      children.forEach((child: DOMElement) => {
+        child.setController(this.controller!);
+
+        this.recursivelySetController(child.getChildren() as DOMElement[]);
+      });
+    }
+  }
+
   append(...children: DOMElement[]) {
     this.element.append(
       ...children.map((item) => {
-        if (this.controller) {
-        }
-        // item.setController(this.controller!);
-
         return item.getElement();
       })
     );
+
+    this.recursivelySetController(children);
 
     this.addChildren(children);
 
@@ -361,16 +402,16 @@ class ListElementModel extends DOMElementModel {
 
 class CustomeListElement extends List {
   createItem(data: unknown): DOMElement {
-    const item = new LI().append(
-      new DIV().append(
-        new DIV().text(data as string),
-        new BUTTON().text("X").addEventListener("click", "removeItem")
+    const item = new LI()
+      .append(
+        new DIV().append(
+          new DIV().text(data as string),
+          new BUTTON()
+            .text("X")
+            .addEventListener("click", "removeItem", { stopPropagation: true })
+        )
       )
-    );
-
-    // console.log(item);
-
-    // .addEventListener("click", "checkItem");
+      .addEventListener("click", "checkItem");
 
     return item;
   }
