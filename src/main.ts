@@ -1,434 +1,471 @@
-class Child {
-  private parent: Parent | null = null;
-  private name: string = "";
+// class Child {
+//   private parent: Parent | null = null;
+//   private name: string = "";
 
-  setName(name: string) {
-    this.name = name;
+import { APP, BUTTON, DIV, DOMElement, UL } from "./DOM.js";
+import { Controllable } from "./core";
+import { ObjectModel } from "./data.js";
 
-    return this;
-  }
+//   setName(name: string) {
+//     this.name = name;
 
-  getName() {
-    return this.name;
-  }
+//     return this;
+//   }
 
-  setParent(parent: Parent) {
-    this.parent = parent;
+//   getName() {
+//     return this.name;
+//   }
 
-    return this;
-  }
+//   setParent(parent: Parent) {
+//     this.parent = parent;
 
-  getParent() {
-    return this.parent;
-  }
-}
+//     return this;
+//   }
 
-class Parent extends Child {
-  private children: Child[] = [];
+//   getParent() {
+//     return this.parent;
+//   }
+// }
 
-  addChildren(children: Child | Child[]) {
-    if (!Array.isArray(children)) {
-      children = [children];
-    }
+// class Parent extends Child {
+//   private children: Child[] = [];
 
-    children.forEach((child) => {
-      child.setParent(this);
-      this.children.push(child);
-    });
+//   addChildren(children: Child | Child[]) {
+//     if (!Array.isArray(children)) {
+//       children = [children];
+//     }
 
-    return this;
-  }
+//     children.forEach((child) => {
+//       child.setParent(this);
+//       this.children.push(child);
+//     });
 
-  removeChild(child: Child) {
-    this.children = this.children.filter((item) => item !== child);
+//     return this;
+//   }
 
-    return this;
-  }
+//   removeChild(child: Child) {
+//     this.children = this.children.filter((item) => item !== child);
 
-  getChildren() {
-    return this.children;
-  }
-}
+//     return this;
+//   }
 
-class Controllable extends Parent {
-  controller: Controller | null = null;
+//   getChildren() {
+//     return this.children;
+//   }
+// }
 
-  setController(controller: Controller) {
-    this.controller = controller;
+// class Controllable extends Parent {
+//   controller: Controller | null = null;
 
-    return this;
-  }
+//   setController(controller: Controller) {
+//     this.controller = controller;
 
-  emit(event: string, data: unknown) {
-    this.controller?.onEvent()?.[event]?.(data);
+//     return this;
+//   }
 
-    return this;
-  }
-}
+//   emit(event: string, data: unknown) {
+//     this.controller?.onEvent()?.[event]?.(data);
 
-class Model extends Controllable {}
+//     return this;
+//   }
+// }
 
-type arrayModelType = unknown[];
+// class Model extends Controllable {}
 
-class ArrayModel extends Model {
-  constructor(
-    private items: arrayModelType,
-    private onPushEvent: string = "push",
-    private onPopEvent: string = "pop",
-    private onRemoveEvent: string = "remove"
-  ) {
-    super();
-  }
+// type arrayModelType = unknown[];
 
-  push(item: unknown) {
-    this.items.push(item);
+// class ArrayModel extends Model {
+//   constructor(
+//     private items: arrayModelType,
+//     private onPushEvent: string = "push",
+//     private onPopEvent: string = "pop",
+//     private onRemoveEvent: string = "remove"
+//   ) {
+//     super();
+//   }
 
-    this.emit(this.onPushEvent, item);
+//   push(item: unknown) {
+//     this.items.push(item);
 
-    return this;
-  }
+//     this.emit(this.onPushEvent, item);
 
-  pop(item: unknown) {
-    this.items.pop();
+//     return this;
+//   }
 
-    this.emit(this.onPopEvent, item);
+//   pop(item: unknown) {
+//     this.items.pop();
 
-    return this;
-  }
+//     this.emit(this.onPopEvent, item);
 
-  get length() {
-    return this.items.length;
-  }
+//     return this;
+//   }
 
-  get(index: number) {
-    return this.items[index];
-  }
+//   get length() {
+//     return this.items.length;
+//   }
 
-  set(index: number, item: unknown) {
-    this.items[index] = item;
-  }
+//   get(index: number) {
+//     return this.items[index];
+//   }
 
-  remove(index: number) {
-    this.items.splice(index, 1);
+//   set(index: number, item: unknown) {
+//     this.items[index] = item;
+//   }
 
-    this.emit(this.onRemoveEvent, index);
+//   remove(index: number) {
+//     this.items.splice(index, 1);
 
-    return this;
-  }
+//     this.emit(this.onRemoveEvent, index);
 
-  insert(index: number, item: unknown) {
-    this.items.splice(index, 0, item);
-  }
-}
+//     return this;
+//   }
 
-class ObjectModel extends Model {
-  constructor(private data: { [key: string]: unknown }) {
-    super();
-    this.setData(data);
-  }
+//   insert(index: number, item: unknown) {
+//     this.items.splice(index, 0, item);
+//   }
+// }
 
-  setData(data: { [key: string]: unknown }) {
-    this.data = data;
-  }
+// class ObjectModel extends Model {
+//   constructor(private data: { [key: string]: unknown }) {
+//     super();
+//     this.setData(data);
+//   }
 
-  get(key: string) {
-    return this.data[key];
-  }
+//   setData(data: { [key: string]: unknown }) {
+//     this.data = data;
+//   }
 
-  set(key: string, value: unknown) {
-    this.data[key] = value;
-  }
+//   get(key: string) {
+//     return this.data[key];
+//   }
 
-  remove(key: string) {
-    delete this.data[key];
-  }
-}
+//   set(key: string, value: unknown) {
+//     this.data[key] = value;
+//   }
+
+//   remove(key: string) {
+//     delete this.data[key];
+//   }
+// }
 
 //DOM Elements
 
-type optionsType = {
-  preventDefault?: boolean;
-  stopPropagation?: boolean;
-};
+// type optionsType = {
+//   preventDefault?: boolean;
+//   stopPropagation?: boolean;
+// };
 
-class DOMElement extends Controllable {
-  private events: string[][] = [];
+// class DOMElement extends Controllable {
+//   private events: string[][] = [];
 
-  constructor(protected element: HTMLElement = document.createElement("div")) {
-    super();
-  }
+//   constructor(protected element: HTMLElement = document.createElement("div")) {
+//     super();
+//   }
 
-  public prepend(parent: HTMLElement = document.body) {
-    parent.prepend(this.element);
+//   public prepend(parent: HTMLElement = document.body) {
+//     parent.prepend(this.element);
 
-    this.onRender();
+//     this.onRender();
 
-    return this;
-  }
+//     return this;
+//   }
 
-  public getElement() {
-    return this.element;
-  }
+//   public getElement() {
+//     return this.element;
+//   }
 
-  public addEventListener(
-    event: string,
-    emitEvent: string,
-    options?: optionsType
-  ) {
-    this.element.addEventListener(
-      event,
-      this.emitEvent.bind(this, { emitEvent, options })
-    );
+//   public addEventListener(
+//     event: string,
+//     emitEvent: string,
+//     options?: optionsType
+//   ) {
+//     this.element.addEventListener(
+//       event,
+//       this.emitEvent.bind(this, { emitEvent, options })
+//     );
 
-    this.events.push([event, emitEvent]);
+//     this.events.push([event, emitEvent]);
 
-    return this;
-  }
+//     return this;
+//   }
 
-  private emitEvent(
-    {
-      emitEvent,
-      options,
-    }: {
-      emitEvent: string;
-      options?: optionsType;
-    },
-    e: Event
-  ) {
-    if (options) {
-      const { preventDefault, stopPropagation } = options;
+//   private emitEvent(
+//     {
+//       emitEvent,
+//       options,
+//     }: {
+//       emitEvent: string;
+//       options?: optionsType;
+//     },
+//     e: Event
+//   ) {
+//     if (options) {
+//       const { preventDefault, stopPropagation } = options;
 
-      if (preventDefault) {
-        e.preventDefault();
-      }
+//       if (preventDefault) {
+//         e.preventDefault();
+//       }
 
-      if (stopPropagation) {
-        e.stopPropagation();
-      }
-    }
+//       if (stopPropagation) {
+//         e.stopPropagation();
+//       }
+//     }
 
-    return this.emit(emitEvent, e);
-  }
+//     return this.emit(emitEvent, e);
+//   }
 
-  onRender() {
-    return this;
-  }
+//   onRender() {
+//     return this;
+//   }
 
-  remove() {
-    this.element.remove();
+//   remove() {
+//     this.element.remove();
 
-    this.onRemove();
+//     this.onRemove();
 
-    return this;
-  }
+//     return this;
+//   }
 
-  onRemove() {
-    this.events.forEach(([event, emitEvent]) => {
-      this.element.removeEventListener(
-        event,
-        this.emitEvent.bind(this, { emitEvent })
-      );
-    });
+//   onRemove() {
+//     this.events.forEach(([event, emitEvent]) => {
+//       this.element.removeEventListener(
+//         event,
+//         this.emitEvent.bind(this, { emitEvent })
+//       );
+//     });
 
-    return this;
-  }
+//     return this;
+//   }
 
-  public setAttribute(name: string, value: string) {
-    this.element.setAttribute(name, value);
+//   public setAttribute(name: string, value: string) {
+//     this.element.setAttribute(name, value);
 
-    return this;
-  }
+//     return this;
+//   }
+// }
+
+// class DOCUMENT extends DOMElement {
+//   constructor() {
+//     super();
+//   }
+
+//   onLoad() {
+//     return this;
+//   }
+// }
+
+// class ContainerElement extends DOMElement {
+//   constructor(protected element: HTMLElement = document.createElement("div")) {
+//     super();
+//   }
+
+//   text(text: string) {
+//     this.element.textContent = text;
+
+//     return this;
+//   }
+
+//   recursivelySetController(children: DOMElement[]) {
+//     if (this.controller) {
+//       children.forEach((child: DOMElement) => {
+//         child.setController(this.controller!);
+
+//         this.recursivelySetController(child.getChildren() as DOMElement[]);
+//       });
+//     }
+//   }
+
+//   append(...children: DOMElement[]) {
+//     this.element.append(
+//       ...children.map((item) => {
+//         return item.getElement();
+//       })
+//     );
+
+//     this.recursivelySetController(children);
+
+//     this.addChildren(children);
+
+//     return this;
+//   }
+// }
+
+// class LI extends ContainerElement {
+//   constructor(protected element: HTMLElement = document.createElement("li")) {
+//     super(element);
+//   }
+// }
+
+// class UL extends ContainerElement {
+//   constructor(protected element: HTMLElement = document.createElement("ul")) {
+//     super(element);
+//   }
+// }
+
+// class DIV extends ContainerElement {
+//   constructor(protected element: HTMLElement = document.createElement("div")) {
+//     super(element);
+//   }
+// }
+
+// class BUTTON extends ContainerElement {
+//   constructor(
+//     protected element: HTMLElement = document.createElement("button")
+//   ) {
+//     super(element);
+//   }
+// }
+
+// class List extends UL {
+//   constructor() {
+//     super();
+//   }
+
+//   protected createItem(data: unknown): DOMElement {
+//     const item = new LI();
+
+//     item.text(data as string);
+
+//     return item;
+//   }
+
+//   private addListItemProps(item: DOMElement): DOMElement {
+//     item.setAttribute("role", "listitem");
+
+//     return item;
+//   }
+
+//   public addItem(data: unknown) {
+//     const item = this.addListItemProps(this.createItem(data));
+
+//     this.append(item);
+
+//     return this;
+//   }
+
+//   removeItemByIndex(index: number) {
+//     this.element.children[index].remove();
+
+//     return this;
+//   }
+// }
+
+//DOM Elements
+
+// class Controller extends Controllable {
+//   constructor() {
+//     super();
+//   }
+
+//   onEvent(): { [key: string]: (data: unknown) => void } {
+//     return {};
+//   }
+// }
+
+// class DOMElementModel extends Controller {
+//   constructor(protected domElement: DOMElement, protected model: Model) {
+//     super();
+
+//     this.domElement.setController(this);
+//     this.model.setController(this);
+//   }
+
+//   prependDomElement() {
+//     this.domElement.prepend();
+//   }
+// }
+
+// class ListElementModel extends DOMElementModel {
+//   constructor(protected listElement: List, protected model: ArrayModel) {
+//     super(listElement, model);
+//   }
+
+//   addItem(data: unknown) {
+//     this.model.push(data);
+
+//     return this;
+//   }
+
+//   onEvent() {
+//     return {
+//       push: (data: unknown) => {
+//         this.listElement.addItem(data);
+//       },
+//       remove: (index: unknown) => {
+//         this.listElement.removeItemByIndex(index as number);
+//       },
+//       checkItem: (event: unknown) => {
+//         console.log("checkItem");
+//       },
+//       removeItem: (event: unknown) => {
+//         this.model.remove(0);
+//         // console.log("removeItem");
+//       },
+//     };
+//   }
+// }
+
+// class CustomeListElement extends List {
+//   createItem(data: unknown): DOMElement {
+//     const item = new LI()
+//       .append(
+//         new DIV().append(
+//           new DIV().text(data as string),
+//           new BUTTON()
+//             .text("X")
+//             .addEventListener("click", "removeItem", { stopPropagation: true })
+//         )
+//       )
+//       .addEventListener("click", "checkItem");
+
+//     return item;
+//   }
+// }
+
+// class CustomeListElementModel extends ListElementModel {
+//   constructor() {
+//     super(new CustomeListElement(), new ArrayModel([]));
+//   }
+// }
+
+// const add = document.getElementById("add")!;
+
+// const list = new CustomeListElementModel();
+
+// add.addEventListener("click", () => {
+//   list.addItem("item");
+// });
+
+// list.prependDomElement();
+
+const app = new APP();
+
+enum EVENTS {
+  DOMContentLoaded = "DOMContentLoaded",
+  newPage = "newPage",
 }
 
-class DOCUMENT extends DOMElement {
-  constructor() {
-    super();
-  }
-
-  onLoad() {
-    return this;
-  }
-}
-
-class ContainerElement extends DOMElement {
-  constructor(protected element: HTMLElement = document.createElement("div")) {
-    super();
-  }
-
-  text(text: string) {
-    this.element.textContent = text;
-
-    return this;
-  }
-
-  recursivelySetController(children: DOMElement[]) {
-    if (this.controller) {
-      children.forEach((child: DOMElement) => {
-        child.setController(this.controller!);
-
-        this.recursivelySetController(child.getChildren() as DOMElement[]);
-      });
-    }
-  }
-
-  append(...children: DOMElement[]) {
-    this.element.append(
-      ...children.map((item) => {
-        return item.getElement();
+app
+  .body(
+    new DIV()
+      .setName("routerContainer")
+      .on(EVENTS.newPage, (element: Controllable) => {
+        element as DOMElement;
       })
-    );
-
-    this.recursivelySetController(children);
-
-    this.addChildren(children);
-
-    return this;
-  }
-}
-
-class LI extends ContainerElement {
-  constructor(protected element: HTMLElement = document.createElement("li")) {
-    super(element);
-  }
-}
-
-class UL extends ContainerElement {
-  constructor(protected element: HTMLElement = document.createElement("ul")) {
-    super(element);
-  }
-}
-
-class DIV extends ContainerElement {
-  constructor(protected element: HTMLElement = document.createElement("div")) {
-    super(element);
-  }
-}
-
-class BUTTON extends ContainerElement {
-  constructor(
-    protected element: HTMLElement = document.createElement("button")
-  ) {
-    super(element);
-  }
-}
-
-class List extends UL {
-  constructor() {
-    super();
-  }
-
-  protected createItem(data: unknown): DOMElement {
-    const item = new LI();
-
-    item.text(data as string);
-
-    return item;
-  }
-
-  private addListItemProps(item: DOMElement): DOMElement {
-    item.setAttribute("role", "listitem");
-
-    return item;
-  }
-
-  public addItem(data: unknown) {
-    const item = this.addListItemProps(this.createItem(data));
-
-    this.append(item);
-
-    return this;
-  }
-
-  removeItemByIndex(index: number) {
-    this.element.children[index].remove();
-
-    return this;
-  }
-}
-
-//DOM Elements
-
-class Controller extends Controllable {
-  constructor() {
-    super();
-  }
-
-  onEvent(): { [key: string]: (data: unknown) => void } {
-    return {};
-  }
-}
-
-class DOMElementModel extends Controller {
-  constructor(protected domElement: DOMElement, protected model: Model) {
-    super();
-
-    this.domElement.setController(this);
-    this.model.setController(this);
-  }
-
-  prependDomElement() {
-    this.domElement.prepend();
-  }
-}
-
-class ListElementModel extends DOMElementModel {
-  constructor(protected listElement: List, protected model: ArrayModel) {
-    super(listElement, model);
-  }
-
-  addItem(data: unknown) {
-    this.model.push(data);
-
-    return this;
-  }
-
-  onEvent() {
-    return {
-      push: (data: unknown) => {
-        this.listElement.addItem(data);
-      },
-      remove: (index: unknown) => {
-        this.listElement.removeItemByIndex(index as number);
-      },
-      checkItem: (event: unknown) => {
-        console.log("checkItem");
-      },
-      removeItem: (event: unknown) => {
-        console.log("removeItem");
-      },
-    };
-  }
-}
-
-class CustomeListElement extends List {
-  createItem(data: unknown): DOMElement {
-    const item = new LI()
-      .append(
-        new DIV().append(
-          new DIV().text(data as string),
-          new BUTTON()
-            .text("X")
-            .addEventListener("click", "removeItem", { stopPropagation: true })
-        )
+      .setModel(
+        new ObjectModel({
+          activePage: {
+            value: "",
+            allowedValues: ["a", "b", "c"],
+            onChange: EVENTS.newPage,
+          },
+        })
+          .setName("main")
+          .on(EVENTS.DOMContentLoaded, (model: Controllable) => {
+            (model as ObjectModel).change("activePage", "a");
+          })
       )
-      .addEventListener("click", "checkItem");
+  )
+  .listenDOMContentLoaded();
 
-    return item;
-  }
-}
-
-class CustomeListElementModel extends ListElementModel {
-  constructor() {
-    super(new CustomeListElement(), new ArrayModel([]));
-  }
-}
-
-const add = document.getElementById("add")!;
-
-const list = new CustomeListElementModel();
-
-add.addEventListener("click", () => {
-  list.addItem("item");
-});
-
-list.prependDomElement();
+console.log(app);
