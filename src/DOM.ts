@@ -8,7 +8,7 @@ type optionsType = {
 
 export class DOMElement extends Controllable {
   private events: string[][] = [];
-  private model?: Model;
+  model?: Model;
 
   constructor(protected element: HTMLElement = document.createElement("div")) {
     super();
@@ -154,25 +154,16 @@ export class ContainerElement extends DOMElement {
     return this;
   }
 
-  // recursivelySetController(children: DOMElement[]) {
-  //   if (this.controller) {
-  //     children.forEach((child: DOMElement) => {
-  //       child.setController(this.controller!);
-
-  //       this.recursivelySetController(child.getChildren() as DOMElement[]);
-  //     });
-  //   }
-  // }
-
   append(...children: DOMElement[]) {
-    // this.element.append(
-    //   ...children.map((item) => {
-    //     return item.getElement();
-    //   })
-    // );
-    // this.recursivelySetController(children);
-    // this.addChild(...children);
-    // return this;
+    this.element.append(
+      ...children.map((item) => {
+        this.controller!.addChild(item);
+
+        return item.getElement();
+      })
+    );
+
+    return this;
   }
 }
 
