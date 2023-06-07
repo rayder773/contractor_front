@@ -1,13 +1,7 @@
 import { APP } from "./DOM.js";
+import { Carousel } from "./components/carousel.js";
 import { Router } from "./components/router.js";
 
-const app = new APP();
+const carousel = new Carousel().appendToBody();
 
-export enum EVENTS {
-  DOMContentLoaded = "DOMContentLoaded",
-  newPage = "newPage",
-}
-
-app.body(new Router()).listenDOMContentLoaded();
-
-console.log(app);
+console.log(carousel);

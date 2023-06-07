@@ -1,4 +1,4 @@
-import { Controllable, Controller } from "./core.js";
+import { Child, Controller } from "./core.js";
 import { Model } from "./data";
 
 type optionsType = {
@@ -6,28 +6,11 @@ type optionsType = {
   stopPropagation?: boolean;
 };
 
-export class DOMElement extends Controllable {
-  private events: string[][] = [];
-  model?: Model;
+export class DOMElement extends Controller {
+  childrenByName: { [key: string]: DOMElement } = {};
 
   constructor(protected element: HTMLElement = document.createElement("div")) {
     super();
-  }
-
-  public prepend(parent: HTMLElement = document.body) {
-    parent.prepend(this.element);
-
-    this.onRender();
-
-    return this;
-  }
-
-  public render(parent: HTMLElement = document.body) {
-    parent.append(this.element);
-
-    this.onRender();
-
-    return this;
   }
 
   public getElement() {
@@ -44,7 +27,13 @@ export class DOMElement extends Controllable {
       this.emitEvent.bind(this, { emitEvent, options })
     );
 
-    this.events.push([event, emitEvent]);
+    // this.events.push([event, emitEvent]);
+
+    return this;
+  }
+
+  public onClick(name: string, options?: optionsType) {
+    this.addEventListener("click", name, options);
 
     return this;
   }
@@ -87,12 +76,17 @@ export class DOMElement extends Controllable {
   }
 
   onRemove() {
-    this.events.forEach(([event, emitEvent]) => {
-      this.element.removeEventListener(
-        event,
-        this.emitEvent.bind(this, { emitEvent })
-      );
-    });
+    // this.events.forEach(([event, emitEvent]) => {
+    //   this.element.removeEventListener(
+    //     event,
+    //     this.emitEvent.bind(this, { emitEvent })
+    //   );
+    // });
+    // return this;
+  }
+
+  appendToBody() {
+    document.body.append(this.element);
 
     return this;
   }
@@ -102,21 +96,11 @@ export class DOMElement extends Controllable {
 
     return this;
   }
-
-  setModel(model: Model) {
-    this.model = model;
-
-    this.addChild(model);
-
-    return this;
-  }
 }
 
 export class APP extends Controller {
   constructor() {
     super();
-
-    this.setController(this);
   }
 
   listenDOMContentLoaded() {
@@ -144,6 +128,8 @@ export class APP extends Controller {
 }
 
 export class ContainerElement extends DOMElement {
+  // childrenByName: { [key: string]: DOMElement | Model };
+
   constructor(protected element: HTMLElement = document.createElement("div")) {
     super();
   }
@@ -155,9 +141,11 @@ export class ContainerElement extends DOMElement {
   }
 
   append(...children: DOMElement[]) {
+    // debugger;
     this.element.append(
       ...children.map((item) => {
-        this.controller!.addChild(item);
+        this.addChild(item);
+        // item.setRoot(this.getRoot()!);
 
         return item.getElement();
       })
@@ -174,28 +162,16 @@ export class LI extends ContainerElement {
 }
 
 export class UL extends ContainerElement {
-  private itemInnerFn: ((data: unknown) => DOMElement) | null = null;
-
   constructor(protected element = document.createElement("ul")) {
     super(element);
   }
 
   prependItem() {}
 
-  appendItem(data: unknown) {
-    const li = new LI();
-
-    if (typeof this.itemInnerFn === "function") {
-      li.append(this.itemInnerFn(data));
-    }
+  appendItem(element: DOMElement) {
+    const li = new LI().append(element);
 
     this.append(li);
-
-    return this;
-  }
-
-  public setItemInner(fn: (data: unknown) => DOMElement) {
-    this.itemInnerFn = fn;
 
     return this;
   }

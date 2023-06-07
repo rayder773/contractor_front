@@ -1,6 +1,13 @@
-import { Controllable } from "./core.js";
+import { Controller } from "./core.js";
 
-export class Model extends Controllable {}
+export class Model extends Controller {
+  modelEvents: { [key: string]: Array<[(data: unknown) => void, unknown]> } =
+    {};
+
+  setModelEvents(events: { [key: string]: string }) {
+    return this;
+  }
+}
 
 type arrayModelType = unknown[];
 

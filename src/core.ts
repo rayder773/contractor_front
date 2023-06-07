@@ -1,5 +1,6 @@
 export class Child {
   private parent: Parent | null = null;
+  private root: Parent | null = null;
   private name: string = "";
 
   setName(name: string) {
@@ -20,6 +21,16 @@ export class Child {
 
   getParent() {
     return this.parent;
+  }
+
+  setRoot(root: Parent) {
+    this.root = root;
+
+    return this;
+  }
+
+  getRoot() {
+    return this.root;
   }
 }
 
@@ -42,98 +53,41 @@ export class Parent extends Child {
   getChildren() {
     return this.children;
   }
-}
 
-export class Controllable extends Parent {
-  controller: Controller | null = null;
-  waitForController: Array<[string, (instance: Controllable) => void]> = [];
+  recursivelySetRoot() {
+    const children = this.getChildren() as Parent[];
 
-  setController(controller: Controller) {
-    this.controller = controller;
-
-    this.waitForController.forEach((...args) => {
-      this.controller?.setControllerEvent(...args[0], this);
+    children.forEach((c: Parent) => {
+      c.setRoot(this.getRoot() || this);
+      c.recursivelySetRoot();
     });
-
-    this.waitForController = [];
-
-    return this;
-  }
-
-  emit(event: string, data: unknown) {
-    this.controller?.controllerEvents?.[event]?.forEach(
-      ([callback, controllable]) => {
-        callback(controllable as Controllable);
-      }
-    );
-
-    return this;
-  }
-
-  on(event: string, callback: (instance: Controllable) => void) {
-    this.waitForController.push([event, callback]);
-
-    return this;
   }
 }
 
-export class Controller extends Controllable {
+export class Controller extends Parent {
   controllerEvents: {
     [key: string]: Array<
-      [callback: (data: Controllable) => void, controllable: Controllable]
+      [callback: (data: Controller) => void, controllable: Controller]
     >;
   } = {};
 
   entities: {
     [key: string]: {
-      [key: string]: (data: Controllable) => void;
+      [key: string]: (data: Controller) => void;
     };
   } = {};
+
+  events: { [key: string]: string } = {};
+
+  childrenByName: { [key: string]: Child } = {};
 
   constructor() {
     super();
   }
 
-  recursivelySetController(child: Controllable) {
-    if (this.controller) {
-      const children = child.getChildren() as Controllable[];
-
-      children.forEach((c: Controllable) => {
-        c.setController(this.controller!);
-        this.recursivelySetController(c);
-      });
-    }
-  }
-
-  override addChild(child: Controllable) {
-    super.addChild(child);
-
-    child.setController(this.controller!);
-
-    this.recursivelySetController(child);
-
+  on(event: string, callback: (instance: Controller) => void) {
     return this;
   }
 
-  setControllerEvent(
-    eventName: string,
-    callback: (data: Controllable) => void,
-    controllable: Controllable
-  ) {
-    const entityName = controllable.getName();
-
-    if (!this.entities[entityName]) {
-      this.entities[entityName] = {};
-    }
-
-    this.entities[entityName][eventName] = callback;
-
-    if (!this.controllerEvents[eventName]) {
-      this.controllerEvents[eventName] = [];
-    }
-
-    this.controllerEvents[eventName].push([callback, controllable]);
-
-    return this;
-  }
+  emit(eventName: string, data: unknown) {}
 }
