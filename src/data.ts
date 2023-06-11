@@ -13,18 +13,31 @@ type arrayModelType = unknown[];
 
 export class ArrayModel extends Model {
   constructor(
-    private items: arrayModelType,
-    private onPushEvent: string = "push",
-    private onPopEvent: string = "pop",
-    private onRemoveEvent: string = "remove"
+    private items: arrayModelType // private onPushEvent: string = "push", // private onPopEvent: string = "pop", // private onRemoveEvent: string = "remove"
   ) {
     super();
+  }
+
+  setItems(items: arrayModelType) {
+    this.items = items;
+
+    return this;
+  }
+
+  getItemsLength() {
+    return this.items.length;
   }
 
   push(item: unknown) {
     this.items.push(item);
 
-    this.emit(this.onPushEvent, item);
+    const name = this.getName();
+
+    if (!name) {
+      throw new Error("name is not defined");
+    }
+
+    this.emit([name, "add"], item);
 
     return this;
   }
@@ -32,7 +45,7 @@ export class ArrayModel extends Model {
   pop(item: unknown) {
     this.items.pop();
 
-    this.emit(this.onPopEvent, item);
+    // this.emit(this.onPopEvent, item);
 
     return this;
   }
@@ -52,13 +65,17 @@ export class ArrayModel extends Model {
   remove(index: number) {
     this.items.splice(index, 1);
 
-    this.emit(this.onRemoveEvent, index);
+    // this.emit(this.onRemoveEvent, index);
 
     return this;
   }
 
   insert(index: number, item: unknown) {
     this.items.splice(index, 0, item);
+  }
+
+  override init() {
+    super.init(this.items);
   }
 }
 
@@ -96,7 +113,7 @@ export class ObjectModel extends Model {
     this.data[key] = value;
 
     if (this.props[key][eventName]) {
-      this.emit(this.props[key][eventName] as string, value);
+      // this.emit(this.props[key][eventName] as string, value);
     }
   }
 

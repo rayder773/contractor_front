@@ -17,51 +17,43 @@ export class DOMElement extends Controller {
     return this.element;
   }
 
-  public addEventListener(
-    event: string,
-    emitEvent: string,
-    options?: optionsType
-  ) {
-    this.element.addEventListener(
-      event,
-      this.emitEvent.bind(this, { emitEvent, options })
-    );
+  public onClick(options?: optionsType) {
+    const name = this.getName();
 
-    // this.events.push([event, emitEvent]);
-
-    return this;
-  }
-
-  public onClick(name: string, options?: optionsType) {
-    this.addEventListener("click", name, options);
-
-    return this;
-  }
-
-  private emitEvent(
-    {
-      emitEvent,
-      options,
-    }: {
-      emitEvent: string;
-      options?: optionsType;
-    },
-    e: Event
-  ) {
-    if (options) {
-      const { preventDefault, stopPropagation } = options;
-
-      if (preventDefault) {
-        e.preventDefault();
-      }
-
-      if (stopPropagation) {
-        e.stopPropagation();
-      }
+    if (!this.getName()) {
+      throw new Error("name is not defined");
     }
 
-    return this.emit(emitEvent, e);
+    this.element.addEventListener(
+      "click",
+      this.emit.bind(this, [name, "click"], options)
+    );
+
+    return this;
   }
+
+  // private emitEvent(
+  //   {
+  //     emitEvent,
+  //     options,
+  //   }: {
+  //     emitEvent: string;
+  //     options?: optionsType;
+  //   },
+  //   e: Event
+  // ) {
+  //   if (options) {
+  //     const { preventDefault, stopPropagation } = options;
+
+  //     if (preventDefault) {
+  //       e.preventDefault();
+  //     }
+
+  //     if (stopPropagation) {
+  //       e.stopPropagation();
+  //     }
+  //   }
+  // }
 
   onRender() {
     return this;
@@ -75,15 +67,7 @@ export class DOMElement extends Controller {
     return this;
   }
 
-  onRemove() {
-    // this.events.forEach(([event, emitEvent]) => {
-    //   this.element.removeEventListener(
-    //     event,
-    //     this.emitEvent.bind(this, { emitEvent })
-    //   );
-    // });
-    // return this;
-  }
+  onRemove() {}
 
   appendToBody() {
     document.body.append(this.element);
@@ -104,16 +88,16 @@ export class APP extends Controller {
   }
 
   listenDOMContentLoaded() {
-    document.addEventListener(
-      "DOMContentLoaded",
-      this.emit.bind(this, "DOMContentLoaded")
-    );
+    // document.addEventListener(
+    //   "DOMContentLoaded",
+    //   this.emit.bind(this, "DOMContentLoaded")
+    // );
 
     return this;
   }
 
   listenHashChange() {
-    window.addEventListener("hashchange", this.emit.bind(this, "hashchange"));
+    // window.addEventListener("hashchange", this.emit.bind(this, "hashchange"));
 
     return this;
   }
@@ -128,24 +112,20 @@ export class APP extends Controller {
 }
 
 export class ContainerElement extends DOMElement {
-  // childrenByName: { [key: string]: DOMElement | Model };
-
   constructor(protected element: HTMLElement = document.createElement("div")) {
     super();
   }
 
-  text(text: string) {
-    this.element.textContent = text;
+  text(text: string | number) {
+    this.element.textContent = text.toString();
 
     return this;
   }
 
   append(...children: DOMElement[]) {
-    // debugger;
     this.element.append(
       ...children.map((item) => {
         this.addChild(item);
-        // item.setRoot(this.getRoot()!);
 
         return item.getElement();
       })

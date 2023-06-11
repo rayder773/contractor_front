@@ -33,6 +33,6 @@ export class Carousel extends DIV {
           .on(this.events.changeActiveCarouselItem, function (data) {}),
         new BUTTON().text(">").onClick(this.events.nextCarouselItem)
       )
-      .recursivelySetRoot();
+      .start();
   }
 }
